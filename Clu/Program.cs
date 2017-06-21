@@ -1,0 +1,12 @@
+﻿using System;
+
+namespace Clu
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Hello World!");
+        }
+    }
+}
