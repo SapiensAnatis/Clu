@@ -1,9 +1,13 @@
 ﻿
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
+using Microsoft.Extensions.DependencyInjection;
+
 using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 
 namespace Clu
@@ -13,12 +17,22 @@ namespace Clu
         static void Main(string[] args)
             => new Program().MainAsync().GetAwaiter().GetResult();
         
+        private IServiceProvider Services;
+        private DiscordSocketClient Client;
+        private CommandService Commands;
+
+
         public async Task MainAsync()
         {
             string Token = RetrieveToken();
             
-            var Client = new DiscordSocketClient();
+            Client = new DiscordSocketClient();
             Client.Log += Log;
+
+            Services = new ServiceCollection().BuildServiceProvider();
+
+            Commands = new CommandService();
+            await InitCommands();
 
             await Client.LoginAsync(TokenType.Bot, Token);
             await Client.StartAsync();
@@ -27,8 +41,28 @@ namespace Clu
             await Task.Delay(-1);
         }
 
-        // *** Logging
+        public async Task InitCommands()
+        {
+            Client.MessageReceived += HandleCommand;
+            await Commands.AddModulesAsync(Assembly.GetEntryAssembly());
+        }
 
+        public async Task HandleCommand(SocketMessage _Message)
+        {
+            var Message = _Message as SocketUserMessage;
+            if (Message == null) return;
+
+            int ArgStart = 0;
+            if (!Message.HasCharPrefix('?', ref ArgStart)) return;
+
+            var Context = new CommandContext(Client, Message);
+            var result = await Commands.ExecuteAsync(Context, ArgStart, Services);
+
+            if (!result.IsSuccess)
+                await Context.Channel.SendMessageAsync($"Oops, something went wrong! {result.ErrorReason}");
+        }
+
+        // *** Logging
         public Dictionary<LogSeverity, ConsoleColor> LogColors = new Dictionary<LogSeverity, ConsoleColor>() 
         {
             { LogSeverity.Critical, ConsoleColor.DarkRed },
