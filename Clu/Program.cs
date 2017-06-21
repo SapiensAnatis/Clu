@@ -90,7 +90,7 @@ namespace Clu
             // Clean token
             string Token = RawToken.Replace("\n", "");
             
-            Console.WriteLine($"Got token: \"{Token}\"");
+            Log(new LogMessage(LogSeverity.Info, "Core", $"Got token: \"{Token}\""));
             return Token;
         }
     }
