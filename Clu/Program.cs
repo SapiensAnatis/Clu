@@ -1,6 +1,8 @@
 ﻿
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+
 using Discord;
 using Discord.WebSocket;
 
@@ -25,13 +27,44 @@ namespace Clu
             await Task.Delay(-1);
         }
 
+        // *** Logging
+
+        public Dictionary<LogSeverity, ConsoleColor> LogColors = new Dictionary<LogSeverity, ConsoleColor>() 
+        {
+            { LogSeverity.Critical, ConsoleColor.DarkRed },
+            { LogSeverity.Error, ConsoleColor.Red},
+            { LogSeverity.Debug, ConsoleColor.Magenta },
+            { LogSeverity.Info, ConsoleColor.Cyan },
+            { LogSeverity.Warning, ConsoleColor.Yellow },
+            { LogSeverity.Verbose, ConsoleColor.Gray },
+        };
+
+        public Dictionary<LogSeverity, string> LogPrefixes = new Dictionary<LogSeverity, string>()
+        {
+            { LogSeverity.Critical, "CRITICAL"},
+            { LogSeverity.Error, "ERROR"}, // Hopefully having those two in caps will make them easier to spot
+            { LogSeverity.Debug, "Debug"},
+            { LogSeverity.Info, "Info"},
+            { LogSeverity.Warning, "Warn"},
+            { LogSeverity.Verbose, "Info++"},
+        };
+
+
         private Task Log(LogMessage Message)
         {
-            Console.WriteLine(Message.ToString());
+            Console.ForegroundColor = LogColors[Message.Severity];
+            Console.Write($"[{LogPrefixes[Message.Severity]}][{Message.Source}] {Message.ToString()}");
+            if (Message.Exception != null)
+                Console.Write($" ({Message.Exception.ToString()}: {Message.Exception.Message})");
+            
+            Console.Write("\n");
+            // Output e.g. [ERROR][source] Something went wrong
+            Console.ResetColor();
             return Task.CompletedTask;
-            // TODO: Severities (overload for regular function, or default param?)
         }
-        
+
+        // *** Token retrieval 
+
         // Some filepath auto-properties. These are here because the System.IO function calls aren't exactly concise,
         // but are used a lot in making things universal and relative. Saves us some typing
         public string BaseFilepath
