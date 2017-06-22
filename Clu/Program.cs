@@ -59,7 +59,8 @@ namespace Clu
             var result = await Commands.ExecuteAsync(Context, ArgStart, Services);
 
             if (!result.IsSuccess)
-                await Context.Channel.SendMessageAsync($"Oops, something went wrong! {result.ErrorReason}");
+                await this.Log(new LogMessage(LogSeverity.Warning, "HandleCommand", 
+                $"Encountered an error while trying to parse potential command {Message.Content}: {result.Error}; {result.ErrorReason}"));
         }
 
         // *** Logging
