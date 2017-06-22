@@ -8,6 +8,6 @@ For some of the extra commands, particularly those that query web services, addi
 
 A full list of filenames and what API keys are expected from them is as follows:
 
-- `token.txt`: Discord bot token. Get one by creating an application on Discord (https://discordapp.com/developers/applications/me) and adding a bot user. You can then click on some text to reveal that bot's token.
+- `token.txt`: Discord bot token. Get one by creating an application on Discord (https://discordapp.com/developers/applications/me) and adding a bot user. You can then click on some text to reveal that bot's token
 
 - `searchkey.txt`: Google search key to enable querying of Google for ?search, the logic for which is contained in ExtraCommands.cs. You may obtain this API key through creating one in Google's developer console: https://console.developers.google.com/apis/credentials?project=my-project-1487807979660. Before you do that, you must first create a project and enable the Custom Search API for it. Navigate to https://console.developers.google.com/apis/library, and at the top under 'Select a project', create a new one. Then, under Library, in the bottom right within 'Other popular APIs', select Custom Search API. At the top, enable it. Then you can undergo the steps outlined above to get an API key to use it.
