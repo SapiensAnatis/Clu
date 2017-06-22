@@ -262,6 +262,8 @@ __pycache__/
 
 # Ignore sensitive tokens/API keys
 Clu/keychain/** 
+# but keep our README
+!Clu/keychain/README.md
 
 # Ignore VSCode settings
 .vscode/**
