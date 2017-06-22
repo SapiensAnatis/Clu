@@ -60,7 +60,7 @@ namespace Clu
 
             if (!result.IsSuccess)
                 await this.Log(new LogMessage(LogSeverity.Warning, "HandleCommand", 
-                $"Encountered an error while trying to parse potential command {Message.Content}: {result.Error}; {result.ErrorReason}"));
+                $"Encountered an error while trying to parse potential command {Message.Content}: {result.ErrorReason} ({result.Error})"));
         }
 
         // *** Logging
