@@ -8,8 +8,6 @@ For some of the extra commands, particularly those that query web services, addi
 
 A full list of filenames and what API keys are expected from them is as follows:
 
-- `token.txt`: Discord bot token. Get one by creating an application on Discord (https://discordapp.com/developers/applications/me)
-and adding a bot user. You can then click on some text to reveal that bot's token
+- `token.txt`: Discord bot token. Get one by creating an application on Discord (https://discordapp.com/developers/applications/me) and adding a bot user. You can then click on some text to reveal that bot's token
 
-- `searchkey.txt`: Google search key to enable querying of Google for ?search, the
-logic for which is contained in ExtraCommands.cs.
+- `searchkey.txt`: Google search key to enable querying of Google for ?search, the logic for which is contained in ExtraCommands.cs.
