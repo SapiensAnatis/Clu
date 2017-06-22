@@ -21,9 +21,21 @@ namespace Clu
         private DiscordSocketClient Client;
         private CommandService Commands;
 
+        private static DateTime? StartTime;
+        // Make these static so we can access from, say, the command modules
+        // (which is, in fact, the _only_ place we're accessing them from at this time)
+        public static TimeSpan Uptime
+        {
+            get { return DateTime.UtcNow.Subtract(StartTime ?? DateTime.UtcNow); }
+            // Coalesce, in case through some miracle the second line the bot will run hasn't been executed
+            // but someone is still requesting the uptime. If StartTime isn't initialized, it will
+            // simple return a timespan that has a value of zero.
+        }
+
 
         public async Task MainAsync()
         {
+            StartTime = DateTime.UtcNow;
             string Token = RetrieveToken();
             
             Client = new DiscordSocketClient();
