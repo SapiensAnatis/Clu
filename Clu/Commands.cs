@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 public class CoreCommandModule : ModuleBase
 {
     [Command("uptime"), Summary("Find out how long the bot's current session has been running for")]
+    public async Task GetUptime()
     {
         void RemoveSubstring(ref string Original, string Substring) {
             Original = Original.Replace(Substring, "");
@@ -28,6 +29,7 @@ public class CoreCommandModule : ModuleBase
 
         RemoveSubstring(ref UptimeString, "0 days, ");
         RemoveSubstring(ref UptimeString, "0 hours, ");
+        RemoveSubstring(ref UptimeString, "0 minutes and "); // Remove redundant time periods
 
         await ReplyAsync($"I've been running for {UptimeString}.");
 
