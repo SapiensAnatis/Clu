@@ -129,7 +129,7 @@ namespace Clu
                     .WithText($"Search completed in {SearchTimeTaken.Milliseconds}ms."))
                 // Set the URL that our title will point to as the actual Google results page
                 // for the given query, should the user wish to know more.
-                .WithUrl($"http://www.google.com/search?q={Query}");
+                .WithUrl($"http://www.google.com/search?q={Query.Replace(" ", "%20")}");
                     
             foreach (Result r in Results) {
                 Embed.AddField(
