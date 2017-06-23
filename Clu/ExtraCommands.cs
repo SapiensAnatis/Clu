@@ -137,8 +137,11 @@ namespace Clu
                     
             foreach (Result r in Results) {
                 Embed.AddField(
-                    r.Title, r.Snippet
-                ); // Add our results to the embed
+                    // Add our results to the embed
+                    r.Title, r.Snippet.Replace("\n", "")
+                    // And get rid of the newlines in snippets...they're everywhere...seeing one word lines :(
+                    // We have wrap anyway
+                ); 
             }
 
             // Finally, edit our message w/ embed:
