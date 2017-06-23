@@ -123,14 +123,13 @@ namespace Clu
                 .WithAuthor(new EmbedAuthorBuilder()
                     // Set the little icon in the top left to be the Google logo
                     .WithIconUrl("http://i.imgur.com/EgnqiMG.png")
-                    .WithName("google.com")) // You need a name for the icon to show up :/
+                    .WithName($"\"{Query}\"")) // You need a name for the icon to show up :/
                 // Add time stats at the bottom
                 .WithFooter(new EmbedFooterBuilder()
                     .WithText($"Search completed in {SearchTimeTaken.Milliseconds}ms."))
                 // Set the URL that our title will point to as the actual Google results page
                 // for the given query, should the user wish to know more.
-                .WithUrl($"http://www.google.com/search?q={Query}")
-                .WithTitle($"\"{Query}\"");
+                .WithUrl($"http://www.google.com/search?q={Query}");
                     
             foreach (Result r in Results) {
                 Embed.AddField(
