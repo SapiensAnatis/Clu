@@ -132,7 +132,8 @@ namespace Clu
                 // Points to my CSE so as to ensure results are (for the most part) the same.
                 .WithUrl("https://cse.google.co.uk/cse/" +
                         "publicurl?cx=011947631902407852034:gq02yx0e1mq" +
-                        $"&q={Query.Replace(" ", "%20")}");
+                        $"&q={Query.Replace(" ", "%20")}")
+                .WithColor(RandomColor);
                     
             foreach (Result r in Results) {
                 Embed.AddField(
@@ -146,6 +147,30 @@ namespace Clu
                 m.Embed = Embed.Build();
             });
         
+        }
+
+        // The red, yellow, green and blue of the Google logo...
+        // You can add colors to embeds, and I couldn't settle on just one for
+        // such a colourful company as Google. With none, it looks bland.
+        // The only option, therefore, is to randomly select a colour of those four :P
+        public static List<Color> EmbedColors = new List<Color>
+        {
+            // Couldn't be bothered to convert from the hex code I had
+            new Color(0xEA, 0x43, 0x35), // Red
+            new Color(0xFB, 0xBC, 0x05), // Yellow
+            new Color(0x34, 0xA8, 0x53), // Green
+            new Color(0x42, 0x85, 0xF4)  // Blue
+        };
+
+        public static Random RNG = new Random(); // Need a means to roll it
+
+        public static Color RandomColor
+        {
+            get 
+            {
+                int R = RNG.Next(EmbedColors.Count);
+                return EmbedColors[R];
+            }
         }
     }
 
