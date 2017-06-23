@@ -53,7 +53,7 @@ namespace Clu
                                 // some instructions for making your own in the README in keychain/
                                 "&prettyPrint=false" +
                                 // Disable indendations/line breaks for increased performance
-                                "&fields=items(title,snippet)" +
+                                "&fields=items(title,snippet,link)" +
                                 // Filter out everything except the results' titles and descriptions.
                                 // Increases performance. Currently hardcoded. May change later.
                                 $"&num=3" +
@@ -138,9 +138,11 @@ namespace Clu
             foreach (Result r in Results) {
                 Embed.AddField(
                     // Add our results to the embed
-                    r.Title, r.Snippet.Replace("\n", "")
+                    r.Title, 
+                    $"({URLPreview(r.Link)}) " + r.Snippet.Replace("\n", "")
                     // And get rid of the newlines in snippets...they're everywhere...seeing one word lines :(
                     // We have wrap anyway
+                    // Also have a URL preview to give the results a bit of context
                 ); 
             }
 
@@ -175,11 +177,19 @@ namespace Clu
                 return EmbedColors[R];
             }
         }
+
+        public static string URLPreview(string URL)
+        {
+            return URL.Substring(0, URL.IndexOf('/', 8));
+            // Return the URL up to the first slash AFTER http(s)://
+            // assuming that they all start with that
+        }
     }
 
     public class Result
     {
         public string Title { get; set; }
         public string Snippet { get; set; }
+        public string Link { get; set; }
     }
 }
