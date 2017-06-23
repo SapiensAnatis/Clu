@@ -14,23 +14,15 @@ namespace Clu
 {
     public class ExtraCommandsModule : ModuleBase
     {
-        // We have two overloads of the Google() function here so that we can provide
-        // the ability for users to specify a spaced out query without quotes if there is no integer
-        // in front. Default parameters don't work like this, but we can emulate the behaviour of them
-        // by having one overload call the other with a fixed value.
+        // Adding a second argument for result count is far too dificult for it to be worth it when
+        // the link is at the top :/
         [Command("google"), Summary("Retrieve a handful of the top results from Google for a given search query")]
         public async Task Google([Remainder] string Query)
-        {
-            await Google(3, Query); // Overload for no count specified in which it defaults to three
-        }
-
-        [Command("google"), Summary("Retrieve a handful of the top results from Google for a given search query")]
-        public async Task Google(int ResultCount, [Remainder] string Query)
         {
             // Start time. Later in the embed I want to display search time elapsed,
             // this is the first step of being able to do that.
             var SearchStart = DateTime.UtcNow;
-            
+
             /* Google's CSE API is utilized by querying the following URL:
                https://www.googleapis.com/customsearch/v1?parameters
                You can include such paramaters as (notably) query, API key, custom engine to use,
@@ -63,8 +55,8 @@ namespace Clu
                                 // Disable indendations/line breaks for increased performance
                                 "&fields=items(title,snippet)" +
                                 // Filter out everything except the results' titles and descriptions.
-                                // Increases performance.
-                                $"&num={ResultCount}" +
+                                // Increases performance. Currently hardcoded. May change later.
+                                $"&num=3" +
                                 // Limit the number of results to how many the user wants
                                 // Defaults to three. Should increase performance.
                                 $"&key={Keychain.GoogleAPIKey ?? String.Empty}";
