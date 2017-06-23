@@ -164,7 +164,7 @@ namespace Clu
         {
             { LogSeverity.Critical, ConsoleColor.DarkRed },
             { LogSeverity.Error, ConsoleColor.Red},
-            { LogSeverity.Debug, ConsoleColor.Magenta },
+            { LogSeverity.Debug, ConsoleColor.Gray },
             { LogSeverity.Info, ConsoleColor.Cyan },
             { LogSeverity.Warning, ConsoleColor.Yellow },
             { LogSeverity.Verbose, ConsoleColor.Gray },
