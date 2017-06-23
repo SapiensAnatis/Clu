@@ -138,8 +138,9 @@ namespace Clu
             foreach (Result r in Results) {
                 Embed.AddField(
                     // Add our results to the embed
-                    r.Title, r.Snippet
-                    
+                    r.Title, r.Snippet.Replace("\n", "")
+                    // And get rid of the newlines in snippets...they're everywhere...seeing one word lines :(
+                    // We have wrap anyway
                 ); 
             }
 
@@ -179,14 +180,6 @@ namespace Clu
     public class Result
     {
         public string Title { get; set; }
-        
-        private string _Snippet { get; set; } // Backing field
-        public string Snippet
-        {
-            get { return _Snippet; }
-            set { _Snippet = value.Replace("\n", ""); }
-            // And get rid of the newlines in snippets...they're everywhere...seeing one word lines >.>
-            // We have wrap anyway
-        }
+        public string Snippet { get; set; }
     }
 }
