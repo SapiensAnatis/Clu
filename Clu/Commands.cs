@@ -11,8 +11,10 @@ public class CoreCommandModule : ModuleBase
     [Command("uptime"), Summary("Find out how long the bot's current session has been running for")]
     public async Task GetUptime()
     {
-        void RemoveSubstring(ref string Original, string Substring) {
-            Original = Original.Replace(Substring, "");
+        void RemoveSubstrings(ref string Original, params string[] Substrings) {
+            foreach (string Substring in Substrings) {
+                Original = Original.Replace(Substring, "");
+            }
         } // Internal function to strip 0hrs, 0days, etc.
 
         // It's internal because I have no need for it elsewhere. Only accessible from this
@@ -48,17 +50,19 @@ public class CoreCommandModule : ModuleBase
                               $"{Uptime.Minutes} minutes " +
                               $"and {Uptime.Seconds} seconds"; }
 
-        RemoveSubstring(ref UptimeString, "0 decades, ");
-        RemoveSubstring(ref UptimeString, "0 years, ");
-        RemoveSubstring(ref UptimeString, "0 months, ");
-        RemoveSubstring(ref UptimeString, "0 weeks, ");
-        RemoveSubstring(ref UptimeString, "0 days, ");
-        RemoveSubstring(ref UptimeString, "0 hours, ");
-        RemoveSubstring(ref UptimeString, "0 minutes and "); // Remove redundant time periods
+        RemoveSubstrings(ref UptimeString,
+                        "0 decades", "0 years", "0 months", "0 weeks", 
+                        "0 days,", "0 hours", "0 minutes and");
 
+        /* Okay, look, I know this code is really, really ugly. However, I was looking at replacing various
+           string concatenations with StringBuilders, and many people say that the concat approach is faster
+           if, and only if, the number of strings is known. In every case I've done so far (there's similar
+           code in ExtraCommands.cs for making an API request) there have been a known number of concatenations.
+           
+           This is something to do with the fact that it gets optimized into a Concat call at runtime, which I think
+           is uglier than the plus ops, so I won't do it myself, but is much faster than a StringBuilder. */
+           
         await ReplyAsync($"I've been running for {UptimeString}.");
-        
 
-        
     }
 }
