@@ -197,9 +197,19 @@ namespace Clu
 
         public static string URLPreview(string URL)
         {
-            return URL.Substring(0, URL.IndexOf('/', 8));
+            URL = URL.Substring(0, URL.IndexOf('/', 8));
             // Return the URL up to the first slash AFTER http(s)://
             // assuming that they all start with that
+            
+            // Remove additional fluff
+            URL = URL.Replace("//www.", "");
+            URL = URL.Replace("/", ""); // Remove slashes
+            URL = URL.Replace("http:", ""); // Remove http, https etc
+            URL = URL.Replace("https:", "");
+            // The above make it impossible to click on the links, but that was useless anyway,
+            // since they would just lead you to the top-level domain: nowhere near the actual
+            // result in the vast majority of cases.
+            return URL;
         }
     }
 
