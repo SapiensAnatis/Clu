@@ -31,7 +31,7 @@ namespace Clu
                of people, in theory. */
 
             if (String.IsNullOrEmpty(Keychain.GoogleAPIKey)) {
-                AuxillaryLogger.Log(new LogMessage(LogSeverity.Info, "ExtraCommands.cs", 
+                AuxillaryLogger.Log(new LogMessage(LogSeverity.Error, "ExtraCommands.cs", 
                 "A Google query was requested but no API key is present in Clu/keychain/searchkey.txt." +
                 " Aborting..."));
                 return;
