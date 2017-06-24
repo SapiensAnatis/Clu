@@ -14,6 +14,9 @@ namespace Clu
 {
     public class ExtraCommandsModule : ModuleBase
     {
+        public ExtraCommandsModule() {
+            // Need this or apparently dependency errors happen
+        }
         // Adding a second argument for result count is far too dificult for it to be worth it when
         // the link is at the top :/
         [Command("google"), Summary("Retrieve a handful of the top results from Google for a given search query")]
@@ -155,27 +158,41 @@ namespace Clu
         }
 
         // The red, yellow, green and blue of the Google logo...
-        // You can add colors to embeds, and I couldn't settle on just one for
+        // You can add Colors to embeds, and I couldn't settle on just one for
         // such a colourful company as Google. With none, it looks bland.
         // The only option, therefore, is to randomly select a colour of those four :P
-        public static List<Color> EmbedColors = new List<Color>
+        private static List<Discord.Color> EmbedColors = new List<Discord.Color>
         {
             // Couldn't be bothered to convert from the hex code I had
-            new Color(0xEA, 0x43, 0x35), // Red
-            new Color(0xFB, 0xBC, 0x05), // Yellow
-            new Color(0x34, 0xA8, 0x53), // Green
-            new Color(0x42, 0x85, 0xF4)  // Blue
+            new Discord.Color(0xEA, 0x43, 0x35), // Red
+            new Discord.Color(0xFB, 0xBC, 0x05), // Yellow
+            new Discord.Color(0x34, 0xA8, 0x53), // Green
+            new Discord.Color(0x42, 0x85, 0xF4)  // Blue
         };
 
-        public static Random RNG = new Random(); // Need a means to roll it
+        private static Random RNG = new Random(); // Need a means to roll it
 
-        public static Color RandomColor
+        public static Discord.Color RandomColor
         {
             get 
             {
                 int R = RNG.Next(EmbedColors.Count);
-                return EmbedColors[R];
+                Discord.Color SelectedColor = EmbedColors[R];
+                if (!IsSameColorAs(SelectedColor, LastColor)) {
+                    return SelectedColor; 
+                } else {
+                    return RandomColor;
+                }
             }
+        }
+
+        private static Discord.Color LastColor { get; set; } = new Discord.Color(0, 0, 0);
+        // Prevent same colour twice in a row
+        // Default colour to always allow the first colour selected
+        // (black can never be selected, so the equality always fails)
+
+        private static bool IsSameColorAs(Discord.Color A, Discord.Color B) {
+            return (A.R == B.R && A.B == B.B && A.G == B.G);
         }
 
         public static string URLPreview(string URL)
