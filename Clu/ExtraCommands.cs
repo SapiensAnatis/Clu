@@ -14,9 +14,6 @@ namespace Clu
 {
     public class ExtraCommandsModule : ModuleBase
     {
-        public ExtraCommandsModule() {
-            // Need this or apparently dependency errors happen
-        }
         // Adding a second argument for result count is far too dificult for it to be worth it when
         // the link is at the top :/
         [Command("google"), Summary("Retrieve a handful of the top results from Google for a given search query")]
