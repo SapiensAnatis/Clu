@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Clu
 {
-    public class ExtraCommandsModule : ModuleBase
+    public class GoogleModule : ModuleBase
     {
         // Adding a second argument for result count is far too dificult for it to be worth it when
         // the link is at the top :/
