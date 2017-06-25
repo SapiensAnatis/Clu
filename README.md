@@ -8,7 +8,7 @@ One goal of the project is to hand as much control as possible to the bot operat
 
 Very much a work in progress with a very small portion of its intended functionality at this time.
 
-n.b. it is not intended in future for the bot to take over the Discord server, kill all the ISOs, and force its creator into hiding outside of the Grid, all while plotting to invade the real world with an army of repurposed programs.
+n.b. it is not intended in future for the bot to take over the Discord server, derez all the ISOs, and force its creator into hiding outside of the Grid, all while plotting to invade the real world with an army of repurposed programs.
 
 ## Current commands:
 (`$arg`: an argument for you to give, described by what's after the dollar sign)
