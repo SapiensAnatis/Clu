@@ -133,6 +133,9 @@ namespace Clu
                 .WithUrl("https://cse.google.co.uk/cse/" +
                         "publicurl?cx=011947631902407852034:gq02yx0e1mq" +
                         $"&q={Query.Replace(" ", "%20")}")
+                        // We must use %20 rather than spaces, otherwise the embed's URL is considered
+                        // to be invalid by Discord, and a BadRequest error will result if we try
+                        // and push it through.
                 .WithColor(RandomColor);
                     
             foreach (Result r in Results) {
@@ -203,7 +206,7 @@ namespace Clu
             URL = URL.Replace("/", ""); // Remove slashes
             URL = URL.Replace("http:", ""); // Remove http, https etc
             URL = URL.Replace("https:", "");
-            // The above make it impossible to click on the links, but that was useless anyway,
+            // The above makes it impossible to click on the links, but that was useless anyway,
             // since they would just lead you to the top-level domain: nowhere near the actual
             // result in the vast majority of cases.
             return URL;
