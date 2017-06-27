@@ -12,11 +12,8 @@ using Newtonsoft.Json.Linq;
 
 namespace Clu
 {
-    public class ExtraCommandsModule : ModuleBase
+    public class GoogleModule : ModuleBase
     {
-        public ExtraCommandsModule() {
-            // Need this or apparently dependency errors happen
-        }
         // Adding a second argument for result count is far too dificult for it to be worth it when
         // the link is at the top :/
         [Command("google"), Summary("Retrieve a handful of the top results from Google for a given search query")]
@@ -34,7 +31,7 @@ namespace Clu
                of people, in theory. */
 
             if (String.IsNullOrEmpty(Keychain.GoogleAPIKey)) {
-                AuxillaryLogger.Log(new LogMessage(LogSeverity.Info, "ExtraCommands.cs", 
+                AuxillaryLogger.Log(new LogMessage(LogSeverity.Error, "ExtraCommands.cs", 
                 "A Google query was requested but no API key is present in Clu/keychain/searchkey.txt." +
                 " Aborting..."));
                 return;
@@ -136,6 +133,9 @@ namespace Clu
                 .WithUrl("https://cse.google.co.uk/cse/" +
                         "publicurl?cx=011947631902407852034:gq02yx0e1mq" +
                         $"&q={Query.Replace(" ", "%20")}")
+                        // We must use %20 rather than spaces, otherwise the embed's URL is considered
+                        // to be invalid by Discord, and a BadRequest error will result if we try
+                        // and push it through.
                 .WithColor(RandomColor);
                     
             foreach (Result r in Results) {
@@ -197,9 +197,19 @@ namespace Clu
 
         public static string URLPreview(string URL)
         {
-            return URL.Substring(0, URL.IndexOf('/', 8));
+            URL = URL.Substring(0, URL.IndexOf('/', 8));
             // Return the URL up to the first slash AFTER http(s)://
             // assuming that they all start with that
+            
+            // Remove additional fluff
+            URL = URL.Replace("//www.", "");
+            URL = URL.Replace("/", ""); // Remove slashes
+            URL = URL.Replace("http:", ""); // Remove http, https etc
+            URL = URL.Replace("https:", "");
+            // The above makes it impossible to click on the links, but that was useless anyway,
+            // since they would just lead you to the top-level domain: nowhere near the actual
+            // result in the vast majority of cases.
+            return URL;
         }
     }
 
