@@ -89,5 +89,10 @@ namespace Clu
 
         }
         
+        [Command("avatar"), Summary("Get a given user's avatar")]
+        public async Task GetAvatar([Remainder, Summary("The user whose avatar you wish to view")] IUser Target)
+        {
+            await ReplyAsync(Target.GetAvatarUrl(size: 512));
+        }
     }
 }
