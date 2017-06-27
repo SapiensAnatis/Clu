@@ -10,12 +10,12 @@ namespace Clu
 {
     public class CoreCommandModule : ModuleBase
     {
-        public static Regex RemoveBadPlurals = new Regex(@"(?<!\d)1 \w*?(?=s)"); 
+        public Regex RemoveBadPlurals = new Regex(@"(?<!\d)1 \w*?(?=s)"); 
         // Remove plurals from time expressions where the preceding quantity is equal to one 
         // Matches on '1 days/1 minutes', etc, but only actually matches the '1 day' part so what
         // the substitution is will be immediately obvious. Thanks lookaheads!  
         // The beginning lookbehind is to ensure the tail end of 11 days or 31 days doesn't get caught
-        public static Regex NoDoubleSpace = new Regex(@"\s{2,}");
+        public Regex NoDoubleSpace = new Regex(@"\s{2,}");
 
         [Command("uptime"), Summary("Find out how long the bot's current session has been running for")]
         public async Task GetUptime()
