@@ -38,17 +38,6 @@ namespace Clu
             int Months = TotalMonths;
             int Weeks = TotalWeeks - (int)(Uptime.TotalDays/7);
 
-            // It should be noted that this all breaks down with very large timespan values due to the natural innacuracy in
-            // for example stating that there are 4.34524 weeks per month. Because the values are nonsensical with some
-            // months having more days than others, we approximate.
-            // When using the DateTime.MinValue as the startup time, this happens: 
-            // "I've been running for 201 decades, 6 years, 3 months, 81 weeks, 5 days, 23 hours, 35 minutes and 1 seconds."
-            // Sadly, weeks is most affected because it's the smallest time period without an official method, and I'm bad at this
-            // If I use 52 weeks per year I get 382 weeks
-            //
-            // On the bright side, this is totally immaterial unless you're spoofing the times - uptimes should never ever reach
-            // over a year...I will therefore keep 52 weeks a year as it's more readable
-
             if (Uptime.TotalSeconds < 1) { UptimeString = "not very long at all"; } 
             // To avoid printing an empty string, in case a particularly fast-fingered user manages this
             else { UptimeString = $"{Months} months, " +
@@ -58,13 +47,8 @@ namespace Clu
                                 $"{Uptime.Minutes} minutes " +
                                 $"and {Uptime.Seconds} seconds"; }
 
-            /* Okay, look, I know this code is really, really ugly. However, I was looking at replacing various
-            string concatenations with StringBuilders, and many people say that the concat approach is faster
-            if, and only if, the number of strings is known. In every case I've done so far (there's similar
-            code in ExtraCommands.cs for making an API request) there have been a known number of concatenations.
-            
-            This is something to do with the fact that it gets optimized into a Concat call at runtime, which I think
-            is uglier than the plus ops, so I won't do it myself. Either way, the code is faster than a builder. */
+            // I am informed that concats are better for performance if, and only if, the number of concats is known
+            // at compile time. Here, it's known to be 5.
             
             RemoveSubstrings(ref UptimeString,
                             "0 months,", "0 weeks,", 
