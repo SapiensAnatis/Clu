@@ -31,17 +31,10 @@ public class CoreCommandModule : ModuleBase
         string UptimeString = String.Empty;
 
         // Extra timespan things
-        int TotalDecades = (int)(Uptime.TotalDays/3652.5);
-        int TotalYears = (int)(Uptime.TotalDays/365.25); // Leap years mann
         int TotalMonths = (int)(Uptime.TotalDays/30.44); // Bit crap
         int TotalWeeks = (int)(Uptime.TotalDays/7); // Always truncate
-        // The years and decades thing is a joke btw
-        // Now get to actual years/decades/etc
-        int Decades = TotalDecades;
-        int Years = TotalYears - Decades*10;
-        int Months = TotalMonths - TotalYears*12;
-        // According to Google
-        int Weeks = TotalWeeks - (int)(TotalYears*52);
+        int Months = TotalMonths;
+        int Weeks = TotalWeeks - (int)(Uptime.TotalDays/7);
 
         // It should be noted that this all breaks down with very large timespan values due to the natural innacuracy in
         // for example stating that there are 4.34524 weeks per month. Because the values are nonsensical with some
@@ -56,9 +49,7 @@ public class CoreCommandModule : ModuleBase
 
         if (Uptime.TotalSeconds < 1) { UptimeString = "not very long at all"; } 
         // To avoid printing an empty string, in case a particularly fast-fingered user manages this
-        else { UptimeString = $"{Decades} decades, " +
-                              $"{Years} years, " +
-                              $"{Months} months, " +
+        else { UptimeString = $"{Months} months, " +
                               $"{Weeks} weeks, " +
                               $"{Uptime.Days - TotalWeeks*7} days, " +
                               $"{Uptime.Hours} hours, " +
@@ -74,8 +65,8 @@ public class CoreCommandModule : ModuleBase
            is uglier than the plus ops, so I won't do it myself. Either way, the code is faster than a builder. */
         
         RemoveSubstrings(ref UptimeString,
-                        "0 decades,", "0 years,", "0 months,", "0 weeks,", 
-                        "0 days,", "0 hours,", "0 minutes ");
+                        "0 months,", "0 weeks,", 
+                        "0 days,", "0 hours,", "0 minutes and");
         
         int i = 0; // Index change tracker
         foreach (Match m in RemoveBadPlurals.Matches(UptimeString))
