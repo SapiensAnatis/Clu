@@ -101,15 +101,9 @@ namespace Clu
         public static string DiscordBotToken { get; set; }
         public static string GoogleAPIKey { get; set; }
 
-        public static string KeychainPath
-        {
-            get { return System.IO.Path.Combine(Utils.BaseFilepath, "keychain"); }
-            // Add on the Keychain folder
-        }
-
         public static string FileInKeychain(string Filename)
         {
-            return System.IO.Path.Combine(KeychainPath, Filename);
+            return System.IO.Path.Combine(Utils.BaseFilepath, "keychain", Filename);
         }
 
         public static string RetrieveFromKeychain(string Filename)
