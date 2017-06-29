@@ -38,9 +38,9 @@ namespace Clu
             StartTime = DateTime.UtcNow;
 
             // Get Discord bot token
-            Keychain.DiscordBotToken = Keychain.RetrieveFromKeychain("token.txt");
+            Keychain.DiscordBotToken = Keychain.RetrieveFromKeychain("Token.txt");
             // Get Google API key
-            Keychain.GoogleAPIKey = Keychain.RetrieveFromKeychain("searchkey.txt");
+            Keychain.GoogleAPIKey = Keychain.RetrieveFromKeychain("SearchKey.txt");
 
             Client = new DiscordSocketClient();
             Client.Log += Log;
@@ -110,13 +110,15 @@ namespace Clu
         {
             // Get the first line so we miss any formatting
             try {
-                string RawKey = System.IO.File.ReadAllLines(FileInKeychain(Filename))[0];
+                string RawKey = System.IO.File.ReadAllLines(
+                    System.IO.Path.Combine(Utils.BaseFilepath, "keychain", Filename)
+                )[0];
                 // Clean token
                 string Key = RawKey.Replace("\n", "");
 
                 return Key;
             } catch(System.IO.FileNotFoundException) { 
-                if (Filename == "token.txt") {
+                if (Filename == "Token.txt") {
                     // Sorry, but the script is totally useless without a token
                     AuxillaryLogger.Log(new LogMessage(LogSeverity.Critical, "Login", 
                     "Failed to retrieve bot token from token.txt in keychain folder. " +
@@ -179,7 +181,7 @@ namespace Clu
         }
     }
 
-    static class Utils
+    public static class Utils
     {
         public static void Exit()
         {
