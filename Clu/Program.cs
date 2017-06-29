@@ -41,7 +41,7 @@ namespace Clu
             Keychain.DiscordBotToken = Keychain.RetrieveFromKeychain("token.txt");
             // Get Google API key
             Keychain.GoogleAPIKey = Keychain.RetrieveFromKeychain("searchkey.txt");
-            
+
             Client = new DiscordSocketClient();
             Client.Log += Log;
 
@@ -92,15 +92,8 @@ namespace Clu
             return Task.CompletedTask;
         }
 
-        // *** Token retrieval 
 
-        // Some filepath auto-properties. These are here because the System.IO function calls aren't exactly concise,
-        // but are used a lot in making things universal and relative. Saves us some typing
-        public static string BaseFilepath
-        {
-            get { return AppContext.BaseDirectory.Substring(0, AppContext.BaseDirectory.IndexOf("bin")); }
-            // Get the app directory and trim it up to before bin/ so we get the root dir which this file is in
-        }
+        
     }
 
     static class Keychain
@@ -110,7 +103,7 @@ namespace Clu
 
         public static string KeychainPath
         {
-            get { return System.IO.Path.Combine(Program.BaseFilepath, "keychain"); }
+            get { return System.IO.Path.Combine(Utils.BaseFilepath, "keychain"); }
             // Add on the Keychain folder
         }
 
@@ -199,6 +192,19 @@ namespace Clu
             Console.WriteLine("Press Enter to exit...");
             while (Console.ReadKey().Key != ConsoleKey.Enter) {}
             Environment.Exit(0);
+        }
+
+        public static string FileInData(string Filename)
+        {
+            return System.IO.Path.Combine(Utils.BaseFilepath, "data", Filename);
+        }
+
+        // Some filepath auto-properties. These are here because the System.IO function calls aren't exactly concise,
+        // but are used a lot in making things universal and relative. Saves us some typing
+        public static string BaseFilepath
+        {
+            get { return AppContext.BaseDirectory.Substring(0, AppContext.BaseDirectory.IndexOf("bin")); }
+            // Get the app directory and trim it up to before bin/ so we get the root dir which this file is in
         }
     }
 }
