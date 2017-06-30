@@ -7,11 +7,15 @@ using System.Collections.Generic;
 using Discord;
 using Discord.WebSocket;
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 namespace Clu 
 {
     class Behaviour
     {
         public static IDiscordClient Client { get; set; }
+        List<IGuildBotSetting> Settings = new List<IGuildBotSetting>();
         
         public Behaviour(IDiscordClient _Client) 
         {
@@ -124,4 +128,7 @@ namespace Clu
             }
         }
     }
+    
+    
+
 }
