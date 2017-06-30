@@ -44,9 +44,7 @@ namespace Clu
                 await VoiceChannelNaming.UpdateVoiceChannel(Before.VoiceChannel);
             if (After.VoiceChannel != null)
                 await VoiceChannelNaming.UpdateVoiceChannel(After.VoiceChannel);
-        }
-
-        
+        }   
 
         /* This subclass names voice channels after what the majority of occupants have set
          * as their 'Playing' status - to inform users what's going on in the channel. */
@@ -99,7 +97,8 @@ namespace Clu
                 var MostPopularGamesSorted = GamesBeingPlayed.OrderByDescending(
                     x => GamesBeingPlayed.Count(y => (y.Name == x.Name))
                 ) // Filter out games that aren't being played by more than one person
-                .Where(x => GamesBeingPlayed.Count(y => (y.Name == x.Name)) > 1);
+                .Where(x => GamesBeingPlayed.Count(y => (y.Name == x.Name)) > 1)
+                .Distinct(); // If there is a popular game, mention it once
                 
                 // Convert them to a list of non-nullable types
                 List<Game> MostPopularGames = MostPopularGamesSorted.ToList();
@@ -114,6 +113,9 @@ namespace Clu
                         // see above comment about dumbassery
                     
                     return Name;
+                } else if (UsersPlayingGames.Count() == 1) { 
+                    // Only one user playing a game (everyone else is null or not present)
+                    return UsersPlayingGames.First().Game?.Name;
                 } else if (MostPopularGames.Count() == 0) {
                     return "General";
                 } else {
