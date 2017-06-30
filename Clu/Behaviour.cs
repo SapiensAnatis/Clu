@@ -114,7 +114,11 @@ namespace Clu
                         // see above comment about dumbassery
                     
                     return Name;
-                } else return "Multiple games";
+                } else if (MostPopularGames.Count() == 0) {
+                    return "General";
+                } else {
+                    return "Multple games";
+                }
             }
         }
     }
