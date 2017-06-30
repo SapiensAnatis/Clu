@@ -5,7 +5,10 @@
             "Description": "Allow the use of extra commands (e.g. Google search)?",
             "ValueTypeString": "Bool"
         }
-    ] // Not storing specific things such as message ID/values as this can be handled on a per-server basis by inspecting
-      // the messages. I merely wanted to use JSON so it was clearer and I could specify valueType easily
-      // (that is, without resorting to some hacky solution like message = "[bool] Do this, that and this?")
+    ],
+    "_Comment": [
+        {
+            "Why is this here?": "You can't have actual comments in JSON. Everything, and I mean everything, is parsed. So I've included this array which I will totally ignore in my program to write stuff in",
+            "Why JSON?": "I found it would be too hard to persistently track important data such as what inputs and data are expected for certain settings with _just_ messages. It's also much more straightforward to work with programatically."
+        }
 }
