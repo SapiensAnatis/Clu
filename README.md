@@ -16,3 +16,13 @@ n.b. it is not intended in future for the bot to take over the Discord server, d
 `?google $query`: Search Google for the results of $query. Uses Google CSE and requires a Google API key. See README in the keychain folder for more info.
 
 `?uptime`: How long has the bot been up for?
+
+## Current functionality:
+
+The bot is able to set the name of any voice channel to what the most 'popular' game within it is, so as to indicate to others what's going on in there, should they be interested.
+
+Currently not toggleable. Will be soon.
+
+## Settings:
+
+Settings (will) work by changing reactions and posting commands in a specially created settings channel, which by default has read permissions denied to @everyone - so only admins can see it.
