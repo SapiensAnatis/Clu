@@ -1,0 +1,11 @@
+{
+    "Settings": [
+        {
+            "Identifier": "AllowExtraCommands",
+            "Description": "Allow the use of extra commands (e.g. Google search)?",
+            "ValueTypeString": "Bool"
+        }
+    ] // Not storing specific things such as message ID/values as this can be handled on a per-server basis by inspecting
+      // the messages. I merely wanted to use JSON so it was clearer and I could specify valueType easily
+      // (that is, without resorting to some hacky solution like message = "[bool] Do this, that and this?")
+}

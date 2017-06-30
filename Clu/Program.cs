@@ -195,7 +195,7 @@ namespace Clu
         }
     }
 
-    public static class Utils
+    public static partial class Utils
     {
         public static void Exit()
         {
