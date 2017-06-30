@@ -45,6 +45,13 @@ namespace Clu
             Client = new DiscordSocketClient();
             Client.Log += Log;
 
+            var BehaviourInstance = new Behaviour(Client);
+            Client.JoinedGuild += BehaviourInstance.OnJoinedGuild;
+            Client.Ready += BehaviourInstance.OnStartup;
+            Client.GuildMemberUpdated += BehaviourInstance.HandleUserUpdated;
+            Client.UserVoiceStateUpdated += BehaviourInstance.HandleUserVoiceStateUpdated;
+            
+
             Services = new ServiceCollection().BuildServiceProvider();
 
             Commands = new CommandService();
@@ -178,6 +185,13 @@ namespace Clu
             Console.Write("\n");
             // Output e.g. [ERROR][source] Something went wrong
             Console.ResetColor();
+        }
+
+        // Construct the LogMessage autonomously, making function calls to log slightly less clunky
+        // (by avoiding the new statements and constructors)
+        public static void Log(LogSeverity Severity, string Source, string Message, Exception e = null)
+        {
+            Log(new LogMessage(Severity, Source, Message, e)); 
         }
     }
 
