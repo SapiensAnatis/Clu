@@ -17,21 +17,29 @@ namespace Clu
         public static IDiscordClient Client { get; set; }
         List<IGuildBotSetting> Settings = new List<IGuildBotSetting>();
         
+        // This constructor is how we make an instance and subscribe to events from within our main Program class.
+        // It also hands us some control over the client.
         public Behaviour(IDiscordClient _Client) 
         {
             Client = _Client;            
         }
 
+        // This event handler is called when our bot joins a new guild. In this case, what we want to do
+        // is update that guild's voice channel naming as per our script.
+        // This is a seperate method to UpdateAllVoiceChannels to save some work.
         public async Task OnJoinedGuild(SocketGuild g)
         {
             await VoiceChannelNaming.UpdateGuildVoiceChannels(g);
         }
 
+        // When the bot starts, we want to update all voice channels
         public async Task OnStartup()
         {
             await VoiceChannelNaming.UpdateAllVoiceChannels();
         }
 
+        // This event handler is called whenever a user's state changes, which we use to detect a change
+        // in their game which they are listed as playing.
         public async Task HandleUserUpdated(SocketGuildUser Before, SocketGuildUser After)
         {
             // If it wasn't a game update, we don't care
@@ -42,6 +50,9 @@ namespace Clu
             await VoiceChannelNaming.UpdateVoiceChannel(After.VoiceChannel);
         }
 
+        // This event handler is used to determine when a user has left or joined a voice channel.
+        // It also fires whenever they mute and unmute themselves.
+        // TODO: exclude voice state changing (mute/deafen) 
         public async Task HandleUserVoiceStateUpdated(SocketUser User, SocketVoiceState Before, SocketVoiceState After)
         {
             if (Before.VoiceChannel != null)
@@ -55,6 +66,9 @@ namespace Clu
          
         static class VoiceChannelNaming
         {
+            // I built these methods on each other; as you saw above different events call for a different
+            // scale of refreshing. For conveniences sake, I could expose parts of these methods to avoid writing
+            // foreach loops in the event handlers.
             public static async Task UpdateAllVoiceChannels()
             {
                 var Guilds = await Client.GetGuildsAsync();
@@ -71,8 +85,12 @@ namespace Clu
                 }
             }
 
+            // The actual code which connects our name determinant function to renaming the channel.
+            // I didn't want to make the function which determines the name async, as it's more of a utility,
+            // so all of the async work is done here.
             public static async Task UpdateVoiceChannel(IVoiceChannel Channel)
             {
+                // Don't mess with the AFK channel. Nobody plays games in it anyway...hence AFK
                 if (Channel.Id == Channel.Guild.AFKChannelId)
                     return;
                 string NewName = GetVoiceChannelName(await Channel.GetUsersAsync().Flatten());
@@ -80,13 +98,15 @@ namespace Clu
                     await Channel.ModifyAsync(x=> x.Name = NewName);
                 } 
                 catch (Exception e) { 
+                    // If my checks haven't caught someone trying to (most likely) change the voice channel name to something
+                    // that it shouldn't be, then we can handle that to avoid crashing the bot
                     AuxillaryLogger.Log(LogSeverity.Error, "VoiceChannelRename", 
                     $"Failed to change the voice channel's name to: {NewName} ({e.ToString()}: {e.Message})");
                 }
             }
 
             // Get the most popular game being played and return its name as a string
-            // Requires users rather than a channel, to avoid making is async
+            // Requires users rather than a channel, to avoid making is async (getting users from a channel is an async op)
             private static string GetVoiceChannelName(IEnumerable<IGuildUser> Users)
             { 
                 if (Users.Count() == 0) { return "General"; }
