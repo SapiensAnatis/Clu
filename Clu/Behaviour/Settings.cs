@@ -31,7 +31,7 @@ namespace Clu
     // This is basically just the interface as a class, which we'll deserialize to. You cannot deserialize to abstract classes/interfaces
     // due to the fact that they can't be instantiated. The idea is to never use or store data as this type for an extended period of time.
     // Once deserialized, ideally send a message to the channel (or look for one), attach it, and cast to IGuildBotSetting ASAP
-    class DSRBotSetting : IBotSetting
+    class DeserializedBotSetting : IBotSetting
     {
         public string Identifier { get; }
         public string Description { get; }

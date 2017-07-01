@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -7,40 +6,35 @@ using System.Collections.Generic;
 using Discord;
 using Discord.WebSocket;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
 namespace Clu 
 {
-    class Behaviour
+    partial class Behaviour
     {
         private IDiscordClient _Client { get; set; }
-        List<IGuildBotSetting> Settings = new List<IGuildBotSetting>();
         
         // This constructor is how we make an instance and subscribe to events from within our main Program class.
         // It also hands us some control over the client.
         public Behaviour(IDiscordClient client) 
-        {
-            this._Client = client;            
-        }
+            => this._Client = client;            
+        
 
         // This event handler is called when our bot joins a new guild. In this case, what we want to do
         // is update that guild's voice channel naming as per our script.
         // This is a seperate method to UpdateAllVoiceChannels to save some work.
-        public async Task OnJoinedGuild(SocketGuild g)
-        {
-            await VoiceChannelNaming.UpdateGuildVoiceChannels(g);
-        }
+        // VCR = VoiceChannelRename to reduce ambiguity between event handlers
+        public async Task VCR_OnJoinedGuild(SocketGuild g)
+            => await VoiceChannelNaming.UpdateGuildVoiceChannels(g);
+        
 
         // When the bot starts, we want to update all voice channels
-        public async Task OnStartup()
-        {
-            await VoiceChannelNaming.UpdateAllVoiceChannels(await _Client.GetGuildsAsync());
-        }
+        public async Task VCR_OnStartup()
+            => await VoiceChannelNaming.UpdateAllVoiceChannels(await _Client.GetGuildsAsync());
+        
+
 
         // This event handler is called whenever a user's state changes, which we use to detect a change
         // in their game which they are listed as playing.
-        public async Task HandleUserUpdated(SocketGuildUser before, SocketGuildUser after)
+        public async Task VCR_HandleUserUpdated(SocketGuildUser before, SocketGuildUser after)
         {
             // If it wasn't a game update, we don't care
             if (before.Game.Equals(after.Game)) { return; }
@@ -53,7 +47,7 @@ namespace Clu
         // This event handler is used to determine when a user has left or joined a voice channel.
         // It also fires whenever they mute and unmute themselves.
         // TODO: exclude voice state changing (mute/deafen) 
-        public async Task HandleUserVoiceStateUpdated(SocketUser user, SocketVoiceState before, SocketVoiceState after)
+        public async Task VCR_HandleVoiceState(SocketUser user, SocketVoiceState before, SocketVoiceState after)
         {
             // If the UserVoiceState was not updated due to a change in voice channel, we have nothing to do.
             if (before.VoiceChannel.Equals(after.VoiceChannel))
