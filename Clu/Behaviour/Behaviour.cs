@@ -63,8 +63,8 @@ namespace Clu
 
         /* This subclass names voice channels after what the majority of occupants have set
          * as their 'Playing' status - to inform users what's going on in the channel. */
-         
-        static class VoiceChannelNaming
+
+        private static class VoiceChannelNaming
         {
             // I built these methods on each other; as you saw above different events call for a different
             // scale of refreshing. For conveniences sake, I could expose parts of these methods to avoid writing
@@ -109,10 +109,10 @@ namespace Clu
             // Requires users rather than a channel, to avoid making is async (getting users from a channel is an async op)
             private static string GetVoiceChannelName(IEnumerable<IGuildUser> Users)
             { 
-                if (Users.Count() == 0) { return "General"; }
+                if (!Users.Any()) { return "General"; }
 
                 var UsersPlayingGames = Users.Where(x => x.Game.HasValue);
-                if (UsersPlayingGames.Count() == 0 ) { return "General"; }
+                if (!UsersPlayingGames.Any()) { return "General"; }
 
                 // Get a list of the games whcih share the top spot for most popular
                 var GamesBeingPlayed = UsersPlayingGames.Select(x => (Game)x.Game);
@@ -140,7 +140,7 @@ namespace Clu
                 } else if (UsersPlayingGames.Count() == 1) { 
                     // Only one user playing a game (everyone else is null or not present)
                     return UsersPlayingGames.First().Game?.Name;
-                } else if (MostPopularGames.Count() == 0) {
+                } else if (!MostPopularGames.Any()) {
                     return "General";
                 } else {
                     return "Multple games";

@@ -67,21 +67,12 @@ namespace Clu
         // so we make this abstract
         public abstract T Value { get; set; } 
         public IUserMessage Message { get; protected set; }
-        public IGuild Guild { 
-            get {
-                return (this.Message.Channel as IGuildChannel)?.Guild;
-                // Returns null if in DMs
-            }   
-        } 
+        public IGuild Guild => (this.Message.Channel as IGuildChannel)?.Guild;
         public string Identifier { get; protected set; }
         public string Description { get; protected set; }
         
         public string ValueTypeString { get; protected set; }
-        public ValueData ValueType {
-            get {
-                return Utils.StringAsEnum<ValueData>(ValueTypeString);
-            } private set {}
-        }
+        public ValueData ValueType => Utils.StringAsEnum<ValueData>(ValueTypeString);
     }
 
     // As an example of a bool GuildBotSetting, here is a bool Y/N setting
@@ -90,17 +81,16 @@ namespace Clu
     {
         private bool _Value { get; set; } // Backing field for custom accessor behaviour
         public override bool Value { 
-            get { return (Utils.GetReactionCount(this.Message, new Emoji("🇾")) > 1); }
+            get => (Message.GetReactionCount(new Emoji("🇾")) > 1);
             // There's no actual need for a N emoji because simply removing your reaction from Y can count as 'no'              
-            set { _Value = value; }
+            set => _Value = value;
         }
 
         // constructor from setting
         // (can't define casts with interfaces or base classes)
         public GuildBotSettingYN(IBotSetting BaseSetting, IUserMessage _Message)
         {
-            if (BaseSetting.ValueType == ValueData.Bool)
-            {
+            if (BaseSetting.ValueType == ValueData.Bool) {
                 this.Identifier = BaseSetting.Identifier;
                 this.Description = BaseSetting.Description;
                 this.ValueTypeString = BaseSetting.ValueTypeString;
@@ -114,14 +104,10 @@ namespace Clu
     public static partial class Utils
     {
         public static int GetReactionCount(this IUserMessage Message, Emoji e)
-        {
-            ReactionMetadata Data = Message.Reactions[e];
-            return Data.ReactionCount;
-        }
-
+            => Message.Reactions[e].ReactionCount;
+        
         public static T StringAsEnum<T>(string Str)
-        {
-            return (T)Enum.Parse(typeof(T), Str);
-        }
+            => (T)Enum.Parse(typeof(T), Str);
+        // Yeah, it's only one line, but I think StringAsEnum<ValueData>("Bool") is much more readable than the below line of code.
     }
 }

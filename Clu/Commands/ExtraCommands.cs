@@ -151,7 +151,7 @@ namespace Clu
 
             // Finally, edit our message w/ embed:
             await EmbedMessage.ModifyAsync(m => {
-                m.Content = String.Empty;
+                m.Content = string.Empty;
                 m.Embed = Embed.Build();
             });
         
@@ -161,7 +161,7 @@ namespace Clu
         // You can add Colors to embeds, and I couldn't settle on just one for
         // such a colourful company as Google. With none, it looks bland.
         // The only option, therefore, is to randomly select a colour of those four :P
-        private static List<Discord.Color> EmbedColors = new List<Discord.Color>
+        private static readonly List<Discord.Color> EmbedColors = new List<Discord.Color>
         {
             // Couldn't be bothered to convert from the hex code I had
             new Discord.Color(0xEA, 0x43, 0x35), // Red
@@ -170,7 +170,7 @@ namespace Clu
             new Discord.Color(0x42, 0x85, 0xF4)  // Blue
         };
 
-        private static Random RNG = new Random(); // Need a means to roll it
+        private static readonly Random RNG = new Random(); // Need a means to roll it
 
         public static Discord.Color RandomColor
         {
@@ -178,11 +178,7 @@ namespace Clu
             {
                 int R = RNG.Next(EmbedColors.Count);
                 Discord.Color SelectedColor = EmbedColors[R];
-                if (!IsSameColorAs(SelectedColor, LastColor)) {
-                    return SelectedColor; 
-                } else {
-                    return RandomColor;
-                }
+                return !IsSameColorAs(SelectedColor, LastColor) ? SelectedColor : RandomColor;
             }
         }
 
@@ -191,9 +187,9 @@ namespace Clu
         // Default colour to always allow the first colour selected
         // (black can never be selected, so the equality always fails)
 
-        private static bool IsSameColorAs(Discord.Color A, Discord.Color B) {
-            return (A.R == B.R && A.B == B.B && A.G == B.G);
-        }
+        private static bool IsSameColorAs(Discord.Color A, Discord.Color B)
+            => (A.R == B.R && A.B == B.B && A.G == B.G);
+        
 
         public static string URLPreview(string URL)
         {

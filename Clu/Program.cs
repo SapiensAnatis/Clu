@@ -1,14 +1,12 @@
 ﻿
-using System;
-using System.Reflection;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-
-using Microsoft.Extensions.DependencyInjection;
-
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Clu
 {
@@ -24,13 +22,7 @@ namespace Clu
         private static DateTime? StartTime;
         // Make these static so we can access from, say, the command modules
         // (which is, in fact, the _only_ place we're accessing them from at this time)
-        public static TimeSpan Uptime
-        {
-            get { return DateTime.UtcNow.Subtract(StartTime ?? DateTime.UtcNow); }
-            // Coalesce, in case through some miracle the second line the bot will run hasn't been executed
-            // but someone is still requesting the uptime. If StartTime isn't initialized, it will
-            // simple return a timespan that has a value of zero.
-        }
+        public static TimeSpan Uptime => DateTime.UtcNow.Subtract(StartTime ?? DateTime.UtcNow);
 
 
         public async Task MainAsync()
@@ -211,10 +203,6 @@ namespace Clu
 
         // Some filepath auto-properties. These are here because the System.IO function calls aren't exactly concise,
         // but are used a lot in making things universal and relative. Saves us some typing
-        public static string BaseFilepath
-        {
-            get { return AppContext.BaseDirectory.Substring(0, AppContext.BaseDirectory.IndexOf("bin")); }
-            // Get the app directory and trim it up to before bin/ so we get the root dir which this file is in
-        }
+        public static string BaseFilepath => AppContext.BaseDirectory.Substring(0, AppContext.BaseDirectory.IndexOf("bin"));
     }
 }
