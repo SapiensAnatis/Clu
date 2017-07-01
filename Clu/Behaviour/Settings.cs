@@ -39,7 +39,7 @@ namespace Clu
         public ValueData ValueType {
             get {
                 return Utils.StringAsEnum<ValueData>(ValueTypeString);
-            } private set {}
+            }
         }
     }
 

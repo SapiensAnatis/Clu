@@ -47,20 +47,20 @@ namespace Clu
             string SearchURL = "https://www.googleapis.com/customsearch/v1" +
                                 $"?q={Query}" + // Our query
                                 "&cx=011947631902407852034:gq02yx0e1mq" +
-                                // A custom search engine I made that searches the whole web, to reduce setup
+                                // cx: A custom search engine I made that searches the whole web, to reduce setup
                                 // Don't think you can get in trouble for spam on this, unlike API keys,
                                 // so I've left mine in here. If I find out that you can, I'll have to add
                                 // some instructions for making your own in the README in keychain/
                                 "&prettyPrint=false" +
-                                // Disable indendations/line breaks for increased performance
+                                // prettyPrint: Disable indendations/line breaks for increased performance
                                 "&fields=items(title,snippet,link)" +
-                                // Filter out everything except the results' titles and descriptions.
+                                // fields: Filter out everything except the results' titles and descriptions.
                                 // Increases performance. Currently hardcoded. May change later.
                                 $"&num=3" +
-                                // Limit the number of results to how many the user wants
+                                // num: Limit the number of results to how many the user wants
                                 // Defaults to three. Should increase performance.
                                 $"&key={Keychain.GoogleAPIKey ?? String.Empty}";
-                                // And finally, add our API key. It can be null, so I've put this here for safety,
+                                // key: And finally, add our API key. It can be null, so I've put this here for safety,
                                 // although the above if statement should prevent a search query from getting 
                                 // this far without any API key.
                                 
@@ -178,6 +178,7 @@ namespace Clu
             {
                 int R = RNG.Next(EmbedColors.Count);
                 Discord.Color SelectedColor = EmbedColors[R];
+                // If it isn't the same colour, return it, otherwise return a new random colour
                 return !IsSameColorAs(SelectedColor, LastColor) ? SelectedColor : RandomColor;
             }
         }
