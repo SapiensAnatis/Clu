@@ -36,11 +36,8 @@ namespace Clu
         public string Identifier { get; }
         public string Description { get; }
         public string ValueTypeString { get; }
-        public ValueData ValueType {
-            get {
-                return Utils.StringAsEnum<ValueData>(ValueTypeString);
-            }
-        }
+        public ValueData ValueType 
+            => Utils.StringAsEnum<ValueData>(ValueTypeString);
     }
 
     // This interface outlines a setting which has an actual value and a message attached to it
@@ -72,7 +69,8 @@ namespace Clu
         public string Description { get; protected set; }
         
         public string ValueTypeString { get; protected set; }
-        public ValueData ValueType => Utils.StringAsEnum<ValueData>(ValueTypeString);
+        public ValueData ValueType 
+            => Utils.StringAsEnum<ValueData>(ValueTypeString);
     }
 
     // As an example of a bool GuildBotSetting, here is a bool Y/N setting
