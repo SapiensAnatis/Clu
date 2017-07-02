@@ -4,6 +4,11 @@
             "Identifier": "AllowExtraCommands",
             "Description": "Allow the use of extra commands (e.g. Google search)?",
             "ValueTypeString": "Bool"
+        },
+        {
+            "Identifier": "RenameVoiceChannels",
+            "Description": "Dyanmically rename voice channels based on what game(s) users in them are playing?",
+            "ValueTypeString": "Bool"
         }
     ],
     "_Comment": [
