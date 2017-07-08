@@ -10,14 +10,6 @@ namespace Clu
 {
     partial class Behaviour
     {
-        private IDiscordClient _Client { get; set; }
-        
-        // This constructor is how we make an instance and subscribe to events from within our main Program class.
-        // It also hands us some control over the client.
-        public Behaviour(IDiscordClient client) 
-            => this._Client = client;            
-        
-
         // This event handler is called when our bot joins a new guild. In this case, what we want to do
         // is update that guild's voice channel naming as per our script.
         // This is a seperate method to UpdateAllVoiceChannels to save some work.
