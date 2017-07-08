@@ -3,18 +3,21 @@
         {
             "Identifier": "AllowExtraCommands",
             "Description": "Allow the use of extra commands (e.g. Google search)?",
-            "ValueTypeString": "Bool"
+            "ValueTypeString": "Bool",
+            "DefaultValueStr": "true"
         },
         {
             "Identifier": "RenameVoiceChannels",
             "Description": "Dyanmically rename voice channels based on what game(s) users in them are playing?",
-            "ValueTypeString": "Bool"
+            "ValueTypeString": "Bool",
+            "DefaultValueStr": "false"
         }
     ],
     "_Comment": [
         {
             "Why is this here?": "You can't have actual comments in JSON. Everything, and I mean everything, is parsed. So I've included this array which I will totally ignore in my program to write stuff in",
-            "Why JSON?": "I found it would be too hard to persistently track important data such as what inputs and data are expected for certain settings with _just_ messages. It's also much more straightforward to work with programatically."
+            "Why JSON?": "I found it would be too hard to persistently track important data such as what inputs and data are expected for certain settings with _just_ messages. It's also much more straightforward to work with programatically.",
+            "Why DefaultValue*str*": "Because it's too much of a pain in the ass to store actual value data which may vary in type and have it deserialized properly. Dynamic variables are a cop out"
         }
     ]
 }
