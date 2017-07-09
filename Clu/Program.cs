@@ -38,10 +38,15 @@ namespace Clu
             Client.Log += Log;
 
             var BehaviourInstance = new Behaviour(Client);
-            Client.JoinedGuild += BehaviourInstance.OnJoinedGuild;
-            Client.Ready += BehaviourInstance.OnStartup;
-            Client.GuildMemberUpdated += BehaviourInstance.HandleUserUpdated;
-            Client.UserVoiceStateUpdated += BehaviourInstance.HandleUserVoiceStateUpdated;
+            // Voice channel rename events
+            Client.JoinedGuild += BehaviourInstance.VCR_OnJoinedGuild;
+            Client.Ready += BehaviourInstance.VCR_OnStartup;
+            Client.GuildMemberUpdated += BehaviourInstance.VCR_HandleUserUpdated;
+            Client.UserVoiceStateUpdated += BehaviourInstance.VCR_HandleVoiceState;
+            // Settings events
+            Client.JoinedGuild += BehaviourInstance.Settings_OnJoinedGuild;
+            Client.Ready += BehaviourInstance.Settings_OnStartup;
+
             
 
             Services = new ServiceCollection().BuildServiceProvider();
