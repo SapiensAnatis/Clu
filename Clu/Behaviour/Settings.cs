@@ -274,7 +274,6 @@ namespace Clu
 
 
         // Abstract class to save me some typing
-        // Would make it private but it must be public to be base for a public class
         private abstract class GuildBotSetting<T> : IGuildBotSetting<T>
         {
             // Each derived class is going to have its own way of determining its value
