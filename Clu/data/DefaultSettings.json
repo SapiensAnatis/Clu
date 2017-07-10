@@ -2,7 +2,7 @@
     "Settings": [
         {
             "Identifier": "AllowExtraCommands",
-            "Description": "Allow the use of extra commands (e.g. Google search)?",
+            "Description": "Allow the use of extra commands, like Google search?",
             "ValueTypeString": "Bool",
             "DefaultValueStr": "true"
         },
