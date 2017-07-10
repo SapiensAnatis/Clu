@@ -23,12 +23,12 @@ namespace Clu
             Settings.LoadSettings();
             
             foreach (SocketGuild Guild in await _Client.GetGuildsAsync())
-                await Settings.InitializeGuild(Guild); // The initialize guild function does not only exist for joining guilds, but also loads instances of settings into memory.
+                await Settings.InitializeGuild(Guild, _Client.CurrentUser as IUser); // The initialize guild function does not only exist for joining guilds, but also loads instances of settings into memory.
         }
 
         public async Task Settings_OnJoinedGuild(SocketGuild guild)
         {
-            await Settings.InitializeGuild(guild);
+            await Settings.InitializeGuild(guild, _Client.CurrentUser as IUser);
         }
     }
 
@@ -55,31 +55,51 @@ namespace Clu
             // which I want to avoid.
         }
 
-        public static async Task InitializeGuild(SocketGuild guild)
+        public static async Task InitializeGuild(SocketGuild guild, IUser botUser)
         {
-            // Helper function to setup guild; didn't want to make LoadSettings() async
+            AuxillaryLogger.Log(LogSeverity.Info, "Settings", $"Initializing settings for guild {guild.Name}...");
+            var StartTime = DateTime.UtcNow;
+
+            // Helper function to setup guild; didn't want to make LoadSettings() async so it's not called from there
             MakeSettingsInstance(guild);
-            var SettingsChannel = guild.TextChannels.Where(c => c.Name == "clu-bot-settings").FirstOrDefault();
+            var SettingsChannel = (ITextChannel)guild.TextChannels.Where(c => c.Name == "clu-bot-settings").FirstOrDefault();
             if (SettingsChannel == null) {
-                await guild.CreateTextChannelAsync("clu-bot-settings"); 
-                // Don't seem to be able to convert that RestTextChannel into SocketTextChannel.. 
-                SettingsChannel = guild.TextChannels.Where(c => c.Name == "clu-bot-settings").First();
+                SettingsChannel = (ITextChannel)await guild.CreateTextChannelAsync("clu-bot-settings"); 
             }
 
             // Don't await getting the message every time in the function call in the loop, get it once and for all
             var Messages = await SettingsChannel.GetMessagesAsync().Flatten();
 
+            // Also, we can clean out the channel here
+            foreach (IMessage m in Messages) {
+                if (m.Author.Id != botUser.Id) {
+                    await m.DeleteAsync();
+                    await Task.Delay(2000);
+                }
+            }
+            
             foreach (DeserializedBotSetting Setting in _BaseSettings) {
-                if (!SettingInChannel(Setting, Messages)) {
-                    RestUserMessage SettingsMessage = await SettingsChannel.SendMessageAsync(Setting.Description);
-                    // Add relevant reactions
-                    await SettingsMessage.AddReactionAsync(new Emoji("✔️"));
-                    await SettingsMessage.AddReactionAsync(new Emoji("❌"));
+                var PossiblyExistingMessage = (IUserMessage)SettingInChannel(Setting, Messages);
+                if (PossiblyExistingMessage == null) {
+                    // Performance diagnostics and that
+                    AuxillaryLogger.Log(LogSeverity.Verbose, "Settings", "\tEncountered missing settings message, posting... (+6 seconds)");
+                    var SettingsMessage = await SettingsChannel.SendMessageAsync(
+                        Setting.Description + $" (default: {Setting.DefaultValueStr})"
+                    );
+                    // I've introduced sleep statements at various places to keep the rate-limits at bay...
+                    // as it's a setup function, speed isn't of the essence.
+                    await Task.Delay(2000);
+                    
                     // RestMessage inherits from IUserMessage, so we can now get to a real type
                     // No method for this as the resultant type will vary...
                     switch (Setting.ValueType)
                     {
                         case ValueData.Bool:
+                            // Add relevant reactions
+                            await SettingsMessage.AddReactionAsync(new Emoji("✔"));
+                            await Task.Delay(2000);
+                            await SettingsMessage.AddReactionAsync(new Emoji("❌"));
+                            await Task.Delay(2000);
                             // The constructor will add it to the relevant lists. No need to assign.
                             // In addition, the guild isn't passed because it's already implied by the message
                             new GuildBotSettingYN(Setting, SettingsMessage);
@@ -92,8 +112,29 @@ namespace Clu
                         default:
                             throw new ArgumentException($"Could not determine what type a message with ValueDataString {Setting.ValueTypeString} should be remade into!");
                     }
+                } else {
+                    // Here's why it returns an IMessage, not a bool
+                    // If already found, but no reactions for some reason, add them
+                    var ReactionDataTick = await PossiblyExistingMessage.GetReactionUsersAsync("✔");
+                    if (!ReactionDataTick.Any(u => u.Id == botUser.Id)) {
+                        AuxillaryLogger.Log(LogSeverity.Verbose, "Settings", "\tEncountered missing bot reaction, adding... (+2 seconds)");
+                        await PossiblyExistingMessage.AddReactionAsync(new Emoji("✔")); 
+                        await Task.Delay(2000);
+                    }
+
+                    var ReactionDataCross = await PossiblyExistingMessage.GetReactionUsersAsync("❌");
+                    if (!ReactionDataCross.Any(u => u.Id == botUser.Id)) {
+                        AuxillaryLogger.Log(LogSeverity.Verbose, "Settings", "\tEncountered missing bot reaction, adding... (+2 seconds)");
+                        await PossiblyExistingMessage.AddReactionAsync(new Emoji("❌")); 
+                        await Task.Delay(2000);
+                    }
                 }
             }
+            double TimeDelta = Math.Round((DateTime.UtcNow - StartTime).TotalSeconds, 3);
+
+            AuxillaryLogger.Log(LogSeverity.Info, "Settings", 
+                $"Completed settings initialization for guild {guild.Name} in {TimeDelta} seconds."
+            );
         }
 
         // In initializing new guilds, refer to this list to post messages
@@ -124,16 +165,16 @@ namespace Clu
             // The constructor will add it to the instances list anyway
         }
 
-        private static bool SettingInChannel(DeserializedBotSetting setting, IEnumerable<IMessage> messages) 
+        private static IMessage SettingInChannel(DeserializedBotSetting setting, IEnumerable<IMessage> messages) 
         {
             foreach (IMessage m in messages) {
                 // It's 'contains' because for more complex data (e.g. list of roles) which can't be shown by reactions
                 // the data will probably end up being added to the body of the settings message.
                 if (m.Content.Contains(setting.Description))
-                    return true;
+                    return m;
             }
 
-            return false;
+            return null;
         }
         
 
@@ -193,10 +234,10 @@ namespace Clu
         // Once deserialized, ideally send a message to the channel (or look for one), attach it, and cast to IGuildBotSetting ASAP
         private class DeserializedBotSetting : IBotSetting
         {
-            public string Identifier { get; private set; } // Must at least have a private set in order for Json.net to deserialize right
-            public string Description { get; private set; }
-            public string ValueTypeString { get; private set; }
-            public string DefaultValueStr { get; private set; }
+            public string Identifier { get; set; } // We don't have a constructor so set must be public
+            public string Description { get; set; }
+            public string ValueTypeString { get; set; }
+            public string DefaultValueStr { get; set; }
             public ValueData ValueType 
                 => Utils.StringAsEnum<ValueData>(ValueTypeString);
         }
