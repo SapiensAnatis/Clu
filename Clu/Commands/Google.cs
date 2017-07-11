@@ -19,6 +19,10 @@ namespace Clu
         [Command("google"), Summary("Retrieve a handful of the top results from Google for a given search query")]
         public async Task Google([Remainder] string Query)
         {
+            // First and foremost check that the command is enabled:
+            if (!Settings.GetGuildSetting<bool>(Context.Guild, "AllowExtraCommands"))
+                return;
+
             // Start time. Later in the embed I want to display search time elapsed,
             // this is the first step of being able to do that.
             var SearchStart = DateTime.UtcNow;

@@ -79,6 +79,9 @@ namespace Clu
             // so all of the async work is done here.
             public static async Task UpdateVoiceChannel(IVoiceChannel Channel)
             {
+                // If the setting is off - don't bother
+                if (!Settings.GetGuildSetting<bool>(Channel.Guild, "RenameVoiceChannels"))
+                    return;
                 // Don't mess with the AFK channel. Nobody plays games in it anyway...hence AFK
                 if (Channel.Id == Channel.Guild.AFKChannelId)
                     return;
