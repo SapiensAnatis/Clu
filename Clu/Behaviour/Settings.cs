@@ -170,19 +170,29 @@ namespace Clu
             );
 
         }
-
-        // In initializing new guilds, refer to this list to post messages
-        private static List<DeserializedBotSetting> _BaseSettings = new List<DeserializedBotSetting>();
+        
         // Make lists so we can easily lookup settings based on identifiers
         // I could use a dictionary indexed by KeyValuePairs but I think that's rather confusing and messy.
         // We will use LINQ to search instead - seen in FromIdentifier within the SettingsInstance class.
+        // In initializing new guilds, refer to this list to post messages
+        private static List<DeserializedBotSetting> _BaseSettings = new List<DeserializedBotSetting>();
+        
         private static List<IGuildBotSetting> _AllSettings = new List<IGuildBotSetting>();
         // However, it is appropriate here because each guild should have only one instance, so we can index by that.
         private static Dictionary<IGuild, SettingsInstance> _AllInstances = new Dictionary<IGuild, SettingsInstance>();
 
-        // My design philosophy behind this class + nested class(es) is that other code should never, ever have a handle on
-        // a type which I've created here, like IGuildBotSettings. Types returned should be data and only data. This is why I have these
-        // helper methods to return standard types and access the private material for use in other places.
+        // Store all setting message IDs, so we have an easy way to check in ReactionUpdated events if the message that
+        // was affected is one we should update, rather than doing a LINQ expression every time someone reacts (which will
+        // be very very frequent). We can do some LINQ to get the right objects *after* we confirm we want it.
+        
+        // Considered making it an array with length = defaultsettings*guildsjoined. However we wouldn't be able to grow
+        // this when the bot joined new guilds mid-session.
+        private static List<ulong> _SettingMessageIds = new List<ulong>();
+
+        /* My design philosophy behind this class + nested class(es) is that other code should never, ever have a handle on
+           a type which I've created here, like IGuildBotSettings. Types returned should be data and only data. This is why I have these
+           helper methods to return standard types and access the private material for use in other places. */
+        
         public static T GetGuildSetting<T>(IGuild guild, string identifier)
         {
             var Instance = _AllInstances[guild];
@@ -193,10 +203,10 @@ namespace Clu
 
         public static async Task UpdateSettingMessage(Cacheable<IUserMessage, ulong> Data)
         {
-            var RelevantSetting = _AllSettings.Where(s => s.Message.Id == Data.Id).FirstOrDefault();
-            if (RelevantSetting == null) return; // Not bothered about random reactions
+            if (!_SettingMessageIds.Contains(Data.Id)) return; // Not bothered about random reactions
 
-            RelevantSetting.Message = await Data.DownloadAsync();
+            var RelevantSetting = _AllSettings.Where(s => s.Message.Id == Data.Id).FirstOrDefault();
+            RelevantSetting.Message = await Data.DownloadAsync(); // Update message
         }
 
         // Need this helper method as SettingsInstance is private & public nested classes are BAD
@@ -350,9 +360,23 @@ namespace Clu
                     return Result;
                 }
             }
+
+            protected void InheritProperties(IBotSetting BaseSetting)
+            {
+                this.Identifier = BaseSetting.Identifier;
+                this.Description = BaseSetting.Description;
+                this.ValueTypeString = BaseSetting.ValueTypeString;
+                this.DefaultValueStr = BaseSetting.DefaultValueStr;
+            }
                 
-            public GuildBotSetting()
-                => _AllSettings.Add(this);
+            public GuildBotSetting(IBotSetting BaseSetting, IUserMessage _Message)
+            {
+                InheritProperties(BaseSetting);
+                Message = _Message;
+
+                _AllSettings.Add(this); 
+                _SettingMessageIds.Add(_Message.Id);
+            }
             
         }
 
@@ -375,37 +399,24 @@ namespace Clu
             // Simple subroutine for absorbing a base setting and taking its common properties.
             // Not appropriate for a cast since an IBotSetting requires additional data to be turned into this
             // (i.e. a Message object)
-            private void InheritProperties(IBotSetting BaseSetting)
-            {
-                this.Identifier = BaseSetting.Identifier;
-                this.Description = BaseSetting.Description;
-                this.ValueTypeString = BaseSetting.ValueTypeString;
-                this.DefaultValueStr = BaseSetting.DefaultValueStr;
-            }
+            
 
             // constructor from setting
             // (can't define casts with interfaces or base classes)
-            public GuildBotSettingYN(IBotSetting BaseSetting, IUserMessage _Message)
+            public GuildBotSettingYN(IBotSetting BaseSetting, IUserMessage _Message) : base(BaseSetting, _Message)
             {
                 if (BaseSetting.ValueType != ValueData.Bool)
                     throw new ArgumentException("Attempted to create a bool setting from an IBotSetting which wasn't of the right type");
-                
-                InheritProperties(BaseSetting);
 
-                this.Message = _Message;
-                _AllSettings.Add(this);
+                // Base constructor does pretty much everything
             }
 
-            public GuildBotSettingYN(IGuildBotSetting BaseSetting)
+            public GuildBotSettingYN(IGuildBotSetting BaseSetting) : base(BaseSetting, BaseSetting.Message)
             {
                 // Clean list of the old settings, which would have this identifier and could mess with lookups
                 if (BaseSetting.ValueType != ValueData.Bool)
                     throw new ArgumentException("Attempted to create a bool setting from an IBotSetting which wasn't of the right type");
                 _AllSettings.RemoveAll(s => (s.Identifier == BaseSetting.Identifier) && s != this);
-
-                InheritProperties(BaseSetting);
-
-                this.Message = BaseSetting.Message;
             }
         }
     }
