@@ -31,6 +31,12 @@ namespace Clu
             await Settings.InitializeGuild(guild, _Client.CurrentUser as IUser);
         }
 
+
+        /* These handlers are for reaction changes which queue messages to be updated in the relevant settings,
+           if the message that was reacted to is determined to be a settings message. We have to update messages
+           as the reaction data is cached and cannot be considered reliable otherwise. We can't simply update the
+           data before a request is made, because then the request for the value of the setting has to be async,
+           which is just stupid. */
         public async Task Settings_OnReactionChange(Cacheable<IUserMessage, ulong> EventData, ISocketMessageChannel arg2, SocketReaction arg3)
         {
             // Hand over to class internals so we have access to data such as settings lists
@@ -175,7 +181,7 @@ namespace Clu
         private static Dictionary<IGuild, SettingsInstance> _AllInstances = new Dictionary<IGuild, SettingsInstance>();
 
         // My design philosophy behind this class + nested class(es) is that other code should never, ever have a handle on
-        // a type which I've created here, like IGuildBotSEttings. Types returned should be data and only data. This is why I have these
+        // a type which I've created here, like IGuildBotSettings. Types returned should be data and only data. This is why I have these
         // helper methods to return standard types and access the private material for use in other places.
         public static T GetGuildSetting<T>(IGuild guild, string identifier)
         {
@@ -331,10 +337,9 @@ namespace Clu
                 get {
                     T Result; // predeclare so we can return afterward
 
-                    // Conversion attempt. Should never fail if class was typed properly. But just in case...
-                    // I mean, I hope I specified a parseable result in each field of my JSON.
-                    // If it goes wrong, it's 100% my fault (assuming the user didn't change the JSON in any way, which is a safe one since they have no reason to,
-                    // unless they are extending the bot in a major way).
+                    /* Here, we try and convert the string to a value of type T. This isn't as risky as it seems,
+                       because all of the default values are pre-specified in the JSON so if it screws up it's entirely
+                       my fault. */
                     try {
                         Result =  (T)Convert.ChangeType(DefaultValueStr, typeof(T)); 
                     } catch { 
@@ -406,13 +411,6 @@ namespace Clu
     }
     public static partial class Utils
     {
-        public static int GetReactionCount(this IUserMessage message, string e)
-            => message.Reactions[new Emoji(e)].ReactionCount;
-        // This was probably just me being lazy, but still I think Message.Reactions[new Emoji("x")].ReactionCount was a bit clunky.
-        // Particularly in if statements, of which there are a lot around the Y/N setting area.
-        
-        // In cases where I already have an emoji object (e.g. in checking if a reaction is already present before adding one), I won't use this
-
         public static T StringAsEnum<T>(string str)
             => (T)Enum.Parse(typeof(T), str);
         // Yeah, it's only one line, but I think StringAsEnum<ValueData>("Bool") is much more readable than what's inside the function.
