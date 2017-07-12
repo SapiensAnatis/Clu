@@ -203,8 +203,6 @@ namespace Clu
     {
         public static void Exit()
         {
-            Console.WriteLine("Press Enter to exit...");
-            while (Console.ReadKey().Key != ConsoleKey.Enter) {}
             Environment.Exit(0);
         }
 
