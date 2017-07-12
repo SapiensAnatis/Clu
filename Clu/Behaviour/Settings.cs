@@ -359,11 +359,11 @@ namespace Clu
             public override bool Value { 
                 get
                 {
-                    // I previously just had one Y emoji for yes or no, but the cross and tick look nicer and allow for default values
-                    if (this.Message.Reactions[new Emoji("✔")].ReactionCount > 1) { return true; }
-                    else if (this.Message.Reactions[new Emoji("❌")].ReactionCount > 1) { return false; }
-                    else { return this.DefaultValue; }  // If ambivalent, return default value
-                    // TODO: prioritize server owner's reaction, then go down the chain
+                    int Yays = this.Message.Reactions[new Emoji("✔")].ReactionCount;
+                    int Nays = this.Message.Reactions[new Emoji("❌")].ReactionCount;
+                    if (Yays == Nays) { return this.DefaultValue; }
+                    // I also must consider that multiple users can react...the channel is only visible to admins (unless changed) so just do greater than
+                    else { return (Yays > Nays); }
                 }        
             }
 
