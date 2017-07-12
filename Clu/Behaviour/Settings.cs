@@ -359,11 +359,11 @@ namespace Clu
             public override bool Value { 
                 get
                 {
-                    int Yays = this.Message.Reactions[new Emoji("✔")].ReactionCount;
+                    int Yeas = this.Message.Reactions[new Emoji("✔")].ReactionCount;
                     int Nays = this.Message.Reactions[new Emoji("❌")].ReactionCount;
-                    if (Yays == Nays) { return this.DefaultValue; }
+                    if (Yeas == Nays) { return this.DefaultValue; }
                     // I also must consider that multiple users can react...the channel is only visible to admins (unless changed) so just do greater than
-                    else { return (Yays > Nays); }
+                    else { return (Yeas > Nays); }
                 }        
             }
 
