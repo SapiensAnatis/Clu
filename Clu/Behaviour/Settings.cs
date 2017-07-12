@@ -291,9 +291,9 @@ namespace Clu
             public string Identifier { get; set; } // We don't have a constructor so set must be public
             public string Description { get; set; }
             public string ValueTypeString { get; set; }
-            public string DefaultValueStr { get; set; }
             public ValueData ValueType 
-                => Utils.StringAsEnum<ValueData>(ValueTypeString);
+                => (ValueData)Enum.Parse(typeof(ValueData), ValueTypeString);
+            public string DefaultValueStr { get; set; }
         }
 
         /* This interface is a setting which rationalizes a read-from-JSON setting to one that
@@ -340,7 +340,7 @@ namespace Clu
             
             public string ValueTypeString { get; protected set; }
             public ValueData ValueType 
-                => Utils.StringAsEnum<ValueData>(ValueTypeString);
+                => (ValueData)Enum.Parse(typeof(ValueData), ValueTypeString);
             public string DefaultValueStr { get; protected set; }
             public virtual T DefaultValue
             {
@@ -419,11 +419,5 @@ namespace Clu
                 _AllSettings.RemoveAll(s => (s.Identifier == BaseSetting.Identifier) && s != this);
             }
         }
-    }
-    public static partial class Utils
-    {
-        public static T StringAsEnum<T>(string str)
-            => (T)Enum.Parse(typeof(T), str);
-        // Yeah, it's only one line, but I think StringAsEnum<ValueData>("Bool") is much more readable than what's inside the function.
     }
 }
