@@ -31,9 +31,16 @@ namespace Clu
             await Settings.InitializeGuild(guild, _Client.CurrentUser as IUser);
         }
 
-        public async Task Settings_OnReactionAdd(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
+        public async Task Settings_OnReactionChange(Cacheable<IUserMessage, ulong> EventData, ISocketMessageChannel arg2, SocketReaction arg3)
         {
-            throw new NotImplementedException();
+            // Hand over to class internals so we have access to data such as settings lists
+            await Settings.UpdateSettingMessage(EventData);
+        }
+
+        // Different args (no emoji)
+        public async Task Settings_OnReactionsCleared(Cacheable<IUserMessage, ulong> EventData, ISocketMessageChannel arg2)
+        {
+            await Settings.UpdateSettingMessage(EventData);
         }
     }
 
@@ -178,6 +185,14 @@ namespace Clu
             return ((IGuildBotSetting<T>)Setting).Value;
         }
 
+        public static async Task UpdateSettingMessage(Cacheable<IUserMessage, ulong> Data)
+        {
+            var RelevantSetting = _AllSettings.Where(s => s.Message.Id == Data.Id).FirstOrDefault();
+            if (RelevantSetting == null) return; // Not bothered about random reactions
+
+            RelevantSetting.Message = await Data.DownloadAsync();
+        }
+
         // Need this helper method as SettingsInstance is private & public nested classes are BAD
         private static void MakeSettingsInstance(IGuild guild)
         {
@@ -270,7 +285,7 @@ namespace Clu
         private interface IGuildBotSetting : IBotSetting
         {
             // The SendMessage (the method we encapsulate the channel messages with) returns RestMessage
-            IUserMessage Message { get; }
+            IUserMessage Message { get; set; }
             IGuild Guild { get; }
         }
         
@@ -302,7 +317,7 @@ namespace Clu
             // Each derived class is going to have its own way of determining its value
             // so we make this abstract. In line with my reasoning above, there shall be no set accessor
             public abstract T Value { get; } 
-            public IUserMessage Message { get; protected set; }
+            public IUserMessage Message { get; set; } // Public set because we need to update it in reactions
             public IGuild Guild { get; private set; }
             public string Identifier { get; protected set; }
             public string Description { get; protected set; }

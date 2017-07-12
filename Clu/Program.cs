@@ -43,6 +43,9 @@ namespace Clu
             // Settings events
             Client.JoinedGuild += BehaviourInstance.Settings_OnJoinedGuild;
             Client.Ready += BehaviourInstance.Settings_OnStartup;
+            Client.ReactionAdded += BehaviourInstance.Settings_OnReactionChange;
+            Client.ReactionRemoved += BehaviourInstance.Settings_OnReactionChange;
+            Client.ReactionsCleared += BehaviourInstance.Settings_OnReactionsCleared;
             // Voice channel rename events
             Client.JoinedGuild += BehaviourInstance.VCR_OnJoinedGuild;
             Client.Ready += BehaviourInstance.VCR_OnStartup;
