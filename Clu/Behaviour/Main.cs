@@ -12,10 +12,10 @@ namespace Clu
     {
         private IDiscordClient _Client { get; set; }
             
-            // This constructor is how we make an instance and subscribe to events from within our main Program class.
-            // It also hands us some control over the client.
-            public Behaviour(IDiscordClient client) 
-                => this._Client = client;   
+        // This constructor is how we make an instance and subscribe to events from within our main Program class.
+        // It also hands us some control over the client.
+        public Behaviour(IDiscordClient client) 
+            => this._Client = client;   
     }
 }
                  

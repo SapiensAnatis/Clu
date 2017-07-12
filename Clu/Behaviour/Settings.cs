@@ -30,6 +30,11 @@ namespace Clu
         {
             await Settings.InitializeGuild(guild, _Client.CurrentUser as IUser);
         }
+
+        public async Task Settings_OnReactionAdd(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     // ----------------------------------------------
@@ -128,6 +133,21 @@ namespace Clu
                         await PossiblyExistingMessage.AddReactionAsync(new Emoji("❌")); 
                         await Task.Delay(2000);
                     }
+                    // Once corrected, create setting objects
+                    switch (Setting.ValueType)
+                    {
+                        case ValueData.Bool:
+                            new GuildBotSettingYN(Setting, PossiblyExistingMessage);
+                            break;
+                        case ValueData.Role:
+                        case ValueData.Roles:
+                        case ValueData.User:
+                        case ValueData.Users:
+                            throw new NotImplementedException();
+                        default:
+                            throw new ArgumentException($"Could not determine what type a message with ValueDataString {Setting.ValueTypeString} should be remade into!");
+                    }
+                    
                 }
             }
             double TimeDelta = Math.Round((DateTime.UtcNow - StartTime).TotalSeconds, 3);
@@ -135,6 +155,7 @@ namespace Clu
             AuxillaryLogger.Log(LogSeverity.Info, "Settings", 
                 $"Completed settings initialization for guild {guild.Name} in {TimeDelta} seconds."
             );
+
         }
 
         // In initializing new guilds, refer to this list to post messages
@@ -149,10 +170,11 @@ namespace Clu
         // My design philosophy behind this class + nested class(es) is that other code should never, ever have a handle on
         // a type which I've created here, like IGuildBotSEttings. Types returned should be data and only data. This is why I have these
         // helper methods to return standard types and access the private material for use in other places.
-        private static T GetGuildSetting<T>(IGuild guild, string identifier)
+        public static T GetGuildSetting<T>(IGuild guild, string identifier)
         {
             var Instance = _AllInstances[guild];
             var Setting = Instance.FromIdentifier(identifier);
+            if (Setting == null) { return default(T); }
             return ((IGuildBotSetting<T>)Setting).Value;
         }
 
@@ -190,10 +212,11 @@ namespace Clu
             // Subroutine to save long lines of code. 
             // In our getters, now all we need to do is cast the returned value of this to our desired type
             public IGuildBotSetting FromIdentifier(string identifier)
-                => _AllSettings
-                    .Where(s => s.Guild == Guild)
-                    .Where(s => s.Identifier == identifier)
-                    .First(); // Should only be one element
+            {
+                return _AllSettings
+                .Where(s => s.Identifier == identifier)
+                .FirstOrDefault();
+            } 
 
             private IGuild Guild { get; set; }
 
@@ -250,7 +273,6 @@ namespace Clu
             IUserMessage Message { get; }
             IGuild Guild { get; }
         }
-
         
         // The value could be anything from a list to a bool, so it's generic
         private interface IGuildBotSetting<T> : IGuildBotSetting
@@ -262,8 +284,9 @@ namespace Clu
         /* As far as values go, I'm not allowing values to be stored in JSON - they must have a getter which
            reads some data attached or near their respective message (e.g. reactions, or the body of the message
            to gleam mentions of roles/users). This is because keeping track of values if in JSON is very finnicky;
-           I would have to store IDs and rework the whole class structure to allow for a value from the start. If
-           stored as IDs, I would then have to implement more operations to get from IDs to IUser or IRole objects.
+           I would have to work in server individuality and save the values to a string and rework the whole class 
+           structure to allow for a value from the start. If they stored like this, I would then have to implement 
+           more operations to get from IDs to IUser or IRole objects.
            
            It also means that the bot is less centralized - a user can be sure of what a setting's value is by looking
            at their own server - even if they don't have access to the running environment of the instance of the bot
@@ -280,7 +303,7 @@ namespace Clu
             // so we make this abstract. In line with my reasoning above, there shall be no set accessor
             public abstract T Value { get; } 
             public IUserMessage Message { get; protected set; }
-            public IGuild Guild => (this.Message.Channel as IGuildChannel)?.Guild; // Seriously if I assign a DM message as a settings message, something went horribly wrong
+            public IGuild Guild { get; private set; }
             public string Identifier { get; protected set; }
             public string Description { get; protected set; }
             
@@ -298,7 +321,7 @@ namespace Clu
                     // If it goes wrong, it's 100% my fault (assuming the user didn't change the JSON in any way, which is a safe one since they have no reason to,
                     // unless they are extending the bot in a major way).
                     try {
-                        Result =  (T)Convert.ChangeType(ValueTypeString, typeof(T)); 
+                        Result =  (T)Convert.ChangeType(DefaultValueStr, typeof(T)); 
                     } catch { 
                         AuxillaryLogger.Log(LogSeverity.Error, "Settings.cs", $"Failed to convert default value str {DefaultValueStr} to type {typeof(T)}!"); 
                         Result = default(T);
@@ -310,6 +333,7 @@ namespace Clu
                 
             public GuildBotSetting()
                 => _AllSettings.Add(this);
+            
         }
 
         // As an example of a bool GuildBotSetting, here is a bool Y/N setting
@@ -321,9 +345,10 @@ namespace Clu
                 get
                 {
                     // I previously just had one Y emoji for yes or no, but the cross and tick look nicer and allow for default values
-                    if (this.Message.GetReactionCount("✔️") > 1) { return true; }
-                    else if (this.Message.GetReactionCount("❌") > 1) { return false; }
+                    if (this.Message.Reactions[new Emoji("✔")].ReactionCount > 1) { return true; }
+                    else if (this.Message.Reactions[new Emoji("❌")].ReactionCount > 1) { return false; }
                     else { return this.DefaultValue; }  // If ambivalent, return default value
+                    // TODO: prioritize server owner's reaction, then go down the chain
                 }        
             }
 
@@ -335,6 +360,7 @@ namespace Clu
                 this.Identifier = BaseSetting.Identifier;
                 this.Description = BaseSetting.Description;
                 this.ValueTypeString = BaseSetting.ValueTypeString;
+                this.DefaultValueStr = BaseSetting.DefaultValueStr;
             }
 
             // constructor from setting
@@ -347,7 +373,7 @@ namespace Clu
                 InheritProperties(BaseSetting);
 
                 this.Message = _Message;
-              
+                _AllSettings.Add(this);
             }
 
             public GuildBotSettingYN(IGuildBotSetting BaseSetting)
