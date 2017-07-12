@@ -182,7 +182,7 @@ namespace Clu
         public static void Log(LogMessage Message)
         {
             Console.ForegroundColor = LogColors[Message.Severity];
-            Console.Write($"[{LogPrefixes[Message.Severity]}][{Message.Source}] {Message.ToString()}");
+            Console.Write($"[{LogPrefixes[Message.Severity]}][{Message.Source}] {Message.Message}");
             if (Message.Exception != null)
                 Console.Write($" ({Message.Exception.ToString()}: {Message.Exception.Message})");
             
