@@ -19,10 +19,8 @@ n.b. it is not intended in future for the bot to take over the Discord server, d
 
 ## Current functionality:
 
-The bot is able to set the name of any voice channel to what the most 'popular' game within it is, so as to indicate to others what's going on in there, should they be interested.
-
-Currently not toggleable. Will be soon.
+The bot is able to set the name of any voice channel to what the most 'popular' game within it is, so as to indicate to others what's going on in there, should they be interested. This setting is able to be toggled by reacting with majority X in the #clu-bot-settings channel under the relevant message.
 
 ## Settings:
 
-Settings (will) work by changing reactions and posting commands in a specially created settings channel, which by default has read permissions denied to @everyone - so only admins can see it.
+Settings are configured by viewing the #clu-bot-settings channel which the bot automatically makes (and posts messages into) for new guilds. For now, the only type of setting is Y/N which can be configured with reactions. It is planned for settings to support passing data such as user(s) and role(s), which may have to be done by commands. I'm not sure.
