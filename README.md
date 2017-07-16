@@ -17,6 +17,8 @@ n.b. it is not intended in future for the bot to take over the Discord server, d
 
 `?uptime`: How long has the bot been up for?
 
+`?wolfram`: Send something to Wolfram Alpha and get a short, one-line result. Will add more response soon.
+
 ## Current functionality:
 
 The bot is able to set the name of any voice channel to what the most 'popular' game within it is, so as to indicate to others what's going on in there, should they be interested. This setting is able to be toggled by reacting with majority X in the #clu-bot-settings channel under the relevant message.
