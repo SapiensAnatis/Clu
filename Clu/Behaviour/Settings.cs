@@ -83,6 +83,9 @@ namespace Clu
             var SettingsChannel = (ITextChannel)guild.TextChannels.Where(c => c.Name == "clu-bot-settings").FirstOrDefault();
             if (SettingsChannel == null) {
                 SettingsChannel = (ITextChannel)await guild.CreateTextChannelAsync("clu-bot-settings"); 
+                await SettingsChannel.AddPermissionOverwriteAsync(
+                    guild.EveryoneRole, OverwritePermissions.DenyAll(SettingsChannel)
+                );
             }
 
             // Don't await getting the message every time in the function call in the loop, get it once and for all
