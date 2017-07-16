@@ -34,6 +34,7 @@ namespace Clu
             // Get Google API key. I should probably have the classes get their respective API keys themselves, rather than have it here
             // But I can't see it mattering too much; I should only need like 5 API keys maximum.
             Keychain.GoogleAPIKey = Keychain.RetrieveFromKeychain("SearchKey.txt");
+            Keychain.WolframClientID = Keychain.RetrieveFromKeychain("WolframClientID.txt");
 
             Client = new DiscordSocketClient();
             Client.Log += Log;
@@ -109,6 +110,7 @@ namespace Clu
     // Static class - by its very nature it must be constant and accessed everywhere
     static class Keychain
     {
+        public static string WolframClientID { get; set; }
         public static string DiscordBotToken { get; set; }
         public static string GoogleAPIKey { get; set; }
 
