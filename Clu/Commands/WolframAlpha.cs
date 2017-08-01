@@ -45,6 +45,11 @@ namespace Clu
                 );
             }
 
+            // TODO:
+            // Fix the formatting for Wolfram Alpha embeds. I think I will follow these rules:
+            // Each embed field is a pod. The title of the field is either the title of the pod, or the contents of the foremost subpod.
+            // The content of all subpods thereafter are each lines in the field.
+
             var ResultEmbed = new EmbedBuilder()
             .WithAuthor(new EmbedAuthorBuilder()
                 .WithName($"Wolfram Alpha: \"{Query}\"")
